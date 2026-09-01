@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   build-apk:
+    name: build-apk
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -22,14 +23,12 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
-          cache: gradle
 
       - name: Install dependencies
         run: npm install
@@ -43,13 +42,13 @@ jobs:
           CI: "1"
         run: npx expo prebuild --platform android --clean
 
-      - name: Build release APK
+      - name: Build APK
         working-directory: android
         run: |
-          chmod +x ./gradlew
+          chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
 
-      - name: Find generated APK
+      - name: Show generated APK
         run: |
           find android/app/build/outputs/apk -type f -name "*.apk" -print
 
