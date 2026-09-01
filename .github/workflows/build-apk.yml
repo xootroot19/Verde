@@ -16,42 +16,65 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      # Baixa os arquivos do repositório
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Node usado pelo Expo
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 22
 
+      # Java necessário para compilar o Android
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
+      # Instala as dependências.
+      # legacy-peer-deps evita o conflito de peer dependencies
+      # que apareceu no seu GitHub Actions.
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
+      # Mostra as versões para facilitar diagnóstico
+      - name: Show versions
+        run: |
+          node --version
+          npm --version
+          npx expo --version
+
+      # Verifica o projeto Expo.
+      # Não interrompe a build caso o doctor apenas gere avisos.
       - name: Check Expo project
         run: npx expo-doctor@latest
         continue-on-error: true
 
+      # Gera a pasta Android nativa
       - name: Generate Android project
         env:
           CI: "1"
         run: npx expo prebuild --platform android --clean
 
-      - name: Build APK
+      # Permissão para executar o Gradle
+      - name: Make Gradle executable
         working-directory: android
-        run: |
-          chmod +x gradlew
-          ./gradlew assembleRelease --no-daemon
+        run: chmod +x gradlew
 
-      - name: Show generated APK
-        run: |
-          find android/app/build/outputs/apk -type f -name "*.apk" -print
+      # Compila o APK Release
+      - name: Build release APK
+        working-directory: android
+        run: ./gradlew assembleRelease --no-daemon --stacktrace
 
+      # Procura o APK gerado
+      - name: Find generated APK
+        run: |
+          echo "APK files:"
+          find android/app/build/outputs -type f -name "*.apk" -print
+
+      # Envia o APK para a área Artifacts do GitHub Actions
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
