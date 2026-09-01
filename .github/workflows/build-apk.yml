@@ -2,16 +2,12 @@ name: Build Android APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
 
 permissions:
   contents: read
 
 jobs:
   build-apk:
-    name: build-apk
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
@@ -31,7 +27,7 @@ jobs:
           java-version: "17"
 
       - name: Install dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Check Expo project
         run: npx expo-doctor@latest
@@ -49,8 +45,9 @@ jobs:
         working-directory: android
         run: ./gradlew assembleRelease --no-daemon --stacktrace
 
-      - name: Find APK
+      - name: Find generated APK
         run: |
+          echo "=== APK GERADO ==="
           find android/app/build/outputs -type f -name "*.apk" -print
 
       - name: Upload APK
