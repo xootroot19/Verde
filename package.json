@@ -1,0 +1,20 @@
+{
+  "name": "verdepay-demo",
+  "version": "1.0.0",
+  "private": true,
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "doctor": "npx expo-doctor@latest",
+    "prebuild:android": "npx expo prebuild --platform android --clean"
+  },
+  "dependencies": {
+    "@expo/vector-icons": "15.1.1",
+    "@react-native-async-storage/async-storage": "3.1.1",
+    "expo": "^57.0.17",
+    "expo-splash-screen": "57.0.8",
+    "react": "19.2.0",
+    "react-native": "0.86.3"
+  }
+}
